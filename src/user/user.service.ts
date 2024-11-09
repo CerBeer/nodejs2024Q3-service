@@ -21,10 +21,11 @@ export class UserService {
 
   create(createUserDto: CreateUserDto) {
     const timestamp = Date.now();
+    const { login, password } = createUserDto;
     const newUser = {
       id: v4(),
-      login: createUserDto.login,
-      password: createUserDto.password,
+      login,
+      password,
       version: 1,
       createdAt: timestamp,
       updatedAt: timestamp,
