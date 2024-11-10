@@ -1,4 +1,4 @@
-export class Favorite {
+export class Favs {
   artists: string[];
   albums: string[];
   tracks: string[];

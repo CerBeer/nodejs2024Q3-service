@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { v4 } from 'uuid';
-import { albums, favorites, tracks } from 'src/memdb/memdb';
+import { albums, favs, tracks } from 'src/memdb/memdb';
 
 @Injectable()
 export class AlbumService {
@@ -56,7 +56,7 @@ export class AlbumService {
   }
 
   remove(id: string) {
-    const index = albums.findIndex((album) => album.id === id);
+    let index = albums.findIndex((album) => album.id === id);
     if (index === -1) {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
@@ -69,10 +69,9 @@ export class AlbumService {
       }
     });
 
-    favorites.albums.map((albumId) => {
-      if (albumId === id) {
-        albumId = null;
-      }
-    });
+    index = favs.albums.findIndex((index) => index === id);
+    if (index !== -1) {
+      favs.albums.splice(index, 1);
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { favorites, tracks } from 'src/memdb/memdb';
+import { favs, tracks } from 'src/memdb/memdb';
 import { v4 } from 'uuid';
 
 @Injectable()
@@ -48,17 +48,16 @@ export class TrackService {
   }
 
   remove(id: string) {
-    const index = tracks.findIndex((track) => track.id === id);
+    let index = tracks.findIndex((track) => track.id === id);
     if (index === -1) {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }
 
     tracks.splice(index, 1);
 
-    favorites.tracks.map((trackId) => {
-      if (trackId === id) {
-        trackId = null;
-      }
-    });
+    index = favs.tracks.findIndex((index) => index === id);
+    if (index !== -1) {
+      favs.tracks.splice(index, 1);
+    }
   }
 }

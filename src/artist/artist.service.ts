@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { v4 } from 'uuid';
-import { albums, artists, favorites, tracks } from 'src/memdb/memdb';
+import { albums, artists, favs, tracks } from 'src/memdb/memdb';
 
 @Injectable()
 export class ArtistService {
@@ -51,7 +51,7 @@ export class ArtistService {
   }
 
   remove(id: string) {
-    const index = artists.findIndex((artist) => artist.id === id);
+    let index = artists.findIndex((artist) => artist.id === id);
     if (index === -1) {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
@@ -70,10 +70,9 @@ export class ArtistService {
       }
     });
 
-    favorites.artists.forEach((artistId) => {
-      if (artistId === id) {
-        artistId = null;
-      }
-    });
+    index = favs.artists.findIndex((index) => index === id);
+    if (index !== -1) {
+      favs.artists.splice(index, 1);
+    }
   }
 }

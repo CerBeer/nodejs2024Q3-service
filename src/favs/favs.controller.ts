@@ -1,34 +1,61 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  HttpCode,
+} from '@nestjs/common';
 import { FavsService } from './favs.service';
-import { CreateFavDto } from './dto/create-fav.dto';
-import { UpdateFavDto } from './dto/update-fav.dto';
+import { IsUUID } from 'class-validator';
+import { StatusCodes } from 'http-status-codes';
 
 @Controller('favs')
 export class FavsController {
   constructor(private readonly favsService: FavsService) {}
-
-  @Post()
-  create(@Body() createFavDto: CreateFavDto) {
-    return this.favsService.create(createFavDto);
-  }
 
   @Get()
   findAll() {
     return this.favsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.favsService.findOne(+id);
+  @Post('track/:id')
+  @IsUUID()
+  addTrack(@Param('id', ParseUUIDPipe) id: string) {
+    return this.favsService.addTrack(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFavDto: UpdateFavDto) {
-    return this.favsService.update(+id, updateFavDto);
+  @HttpCode(StatusCodes.NO_CONTENT)
+  @Delete('track/:id')
+  @IsUUID()
+  removeTrack(@Param('id', ParseUUIDPipe) id: string) {
+    return this.favsService.removeTrack(id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.favsService.remove(+id);
+  @Post('album/:id')
+  @IsUUID()
+  addAlbum(@Param('id', ParseUUIDPipe) id: string) {
+    return this.favsService.addAlbum(id);
+  }
+
+  @Delete('album/:id')
+  @HttpCode(StatusCodes.NO_CONTENT)
+  @IsUUID()
+  removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
+    return this.favsService.removeAlbum(id);
+  }
+
+  @Post('artist/:id')
+  @IsUUID()
+  addArtist(@Param('id', ParseUUIDPipe) id: string) {
+    return this.favsService.addArtist(id);
+  }
+
+  @Delete('artist/:id')
+  @HttpCode(StatusCodes.NO_CONTENT)
+  @IsUUID()
+  removeArtist(@Param('id', ParseUUIDPipe) id: string) {
+    return this.favsService.removeArtist(id);
   }
 }
