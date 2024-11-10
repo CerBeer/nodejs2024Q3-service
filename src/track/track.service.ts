@@ -1,26 +1,64 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { favorites, tracks } from 'src/memdb/memdb';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class TrackService {
   create(createTrackDto: CreateTrackDto) {
-    return 'This action adds a new track';
+    const { name, artistId, albumId, duration } = createTrackDto;
+    const track = {
+      id: v4(),
+      name,
+      artistId,
+      albumId,
+      duration,
+    };
+    tracks.push(track);
+
+    return track;
   }
 
   findAll() {
-    return `This action returns all track`;
+    return tracks;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} track`;
+  findOne(id: string) {
+    const track = tracks.find((track) => track.id === id);
+    if (!track) {
+      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    }
+    return track;
   }
 
-  update(id: number, updateTrackDto: UpdateTrackDto) {
-    return `This action updates a #${id} track`;
+  update(id: string, updateTrackDto: UpdateTrackDto) {
+    const { name, artistId, albumId, duration } = updateTrackDto;
+    const track = tracks.find((track) => track.id === id);
+    if (!track) {
+      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    }
+
+    track.name = name;
+    track.albumId = albumId;
+    track.artistId = artistId;
+    track.duration = duration;
+
+    return track;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} track`;
+  remove(id: string) {
+    const index = tracks.findIndex((track) => track.id === id);
+    if (index === -1) {
+      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    }
+
+    tracks.splice(index, 1);
+
+    favorites.tracks.map((trackId) => {
+      if (trackId === id) {
+        trackId = null;
+      }
+    });
   }
 }
