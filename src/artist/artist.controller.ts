@@ -36,6 +36,7 @@ export class ArtistController {
     return this.artistService.findOne(id);
   }
 
+  @UsePipes(new ValidationPipe())
   @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,

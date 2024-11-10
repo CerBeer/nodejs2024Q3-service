@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { v4 } from 'uuid';
-import { albums, artists, favorites, tracks, users } from 'src/memdb/memdb';
+import { albums, artists, favorites, tracks } from 'src/memdb/memdb';
 
 @Injectable()
 export class ArtistService {
@@ -32,12 +32,18 @@ export class ArtistService {
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
+    const { name, grammy } = updateArtistDto;
+    if (!name) {
+      throw new HttpException('Name are required', HttpStatus.BAD_REQUEST);
+    }
+    if (grammy === undefined) {
+      throw new HttpException('Grammy are required', HttpStatus.BAD_REQUEST);
+    }
     const artist = artists.find((artist) => artist.id === id);
     if (!artist) {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
 
-    const { name, grammy } = updateArtistDto;
     artist.name = name;
     artist.grammy = grammy;
 
