@@ -4,11 +4,24 @@
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Docker - [Download & Install Docker](https://www.docker.com/products/docker-desktop/).
 
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/CerBeer/nodejs2024Q3-service
+```
+
+## Change directory
+
+```
+cd nodejs2024Q3-service
+```
+
+## Switch branch
+
+```
+git checkout develop-pt2
 ```
 
 ## Installing NPM modules
@@ -23,10 +36,31 @@ npm install
 ./.env
 ```
 
-## Running application
+## Scan Docker images for vulnerabilities
 
 ```
-npm start
+npm run scan:api
+```
+```
+npm run scan:db
+```
+
+## Start application in docker
+
+```
+npm run docker:up
+```
+
+## Stop application in docker
+
+```
+npm run docker:down
+```
+
+## Or you can running application locally
+
+```
+npm run start
 ```
 
 After starting the app on port (4000 as default) you can open
