@@ -1,57 +1,34 @@
 services:
+  # app:
+  #   container_name: app
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - ${PORT}:${PORT}
+  #   depends_on:
+  #     - postgres
+  #   env_file:
+  #     - .env
   postgres:
+    image: postgres
     container_name: postgres
     restart: always
-    build:
-      context: ./
-      dockerfile: ./docker/postgres/Dockerfile
-    env_file:
-      - .env
     ports:
       - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    env_file:
+      - .env
     volumes:
       - pgdata:/var/lib/postgresql/data
       - pglog:/var/log/postgresql
     networks:
-      - intranet
-  api:
-    container_name: app
-    restart: always
-    build:
-      context: ./
-      dockerfile: ./docker/app/Dockerfile
-    env_file:
-      - .env
-    ports:
-      - ${PORT}:${PORT}
-    depends_on:
-      - postgres
-    volumes:
-      - ./src:/app/src
-      - node_modules:/usr/src/app/node_modules
-    networks:
-      - intranet
-      - internet
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-    depends_on:
-      - postgres
-    networks:
-      - intranet
       - internet
    
 volumes:
   pgdata:
   pglog:
-  node_modules:
 
 networks:
-  intranet:
-    name: intranet
-    driver: bridge
   internet:
     name: internet
     driver: bridge
