@@ -54,8 +54,6 @@ export class ArtistService {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
 
-    await this.prisma.artist.delete({
-      where: { id },
-    });
+    await this.prisma.artist.delete({ where: { id } });
   }
 }

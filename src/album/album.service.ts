@@ -1,8 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { v4 } from 'uuid';
-import { albums, favs, tracks } from 'src/memdb/memdb';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -59,8 +57,6 @@ export class AlbumService {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
 
-    await this.prisma.album.delete({
-      where: { id },
-    });
+    await this.prisma.album.delete({ where: { id } });
   }
 }
