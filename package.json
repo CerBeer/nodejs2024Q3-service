@@ -20,6 +20,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "docker:pg": "docker-compose -f docker-compose-pg.yaml up -d && npx prisma generate && npx prisma migrate deploy && nest start",
+    "docker:pg-stop": "docker-compose -f docker-compose-pg.yaml stop",
     "docker:rebuild": "docker-compose up --build --force-recreate --remove-orphans --renew-anon-volumes"
   },
   "dependencies": {
