@@ -30,8 +30,6 @@ cd nodejs2024Q3-service
 git checkout develop-pt2
 ```
 
-## Create .env file if absent (based on .env.example)
-
 ## Installing NPM modules
 
 ```
@@ -46,8 +44,10 @@ npm install
 npm run docker:start
 ```
 
-## Wait until the necessary images are downloaded, containers are assembled and launched, this will be indicated by the appearance of the following message in the terminal:
-### [NestApplication] Nest application successfully started
+## Wait until the application is fully launched
+#### the necessary images are downloaded, containers are assembled and launched, this will be indicated by the appearance of the following message in the terminal
+
+- ```[NestApplication] Nest application successfully started```
 
 ## After starting the app on port (4000 as default) you can open in your browser OpenAPI documentation by typing
 
@@ -55,10 +55,16 @@ npm run docker:start
 http://localhost:4000/doc/
 ```
 
-## Open another wsl console and run the command to run the tests
+## Open another wsl console and run the command to run a general test
 
 ```
 npm run test
+```
+
+## To run tests one by one
+
+```
+npm run test user && npm run test album && npm run test artist && npm run test track && npm run test favorites
 ```
 
 ## Stop containers
@@ -80,16 +86,6 @@ npm run docker:scan
 ```
 
 # What else can you do
-
-## Testing
-
-After application running open new terminal and enter:
-
-To run only one of all test suites without authorization
-
-```
-npm run test -- <path to suite>
-```
 
 ## Auto-fix and format
 
