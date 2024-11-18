@@ -3,7 +3,8 @@
 ## Prerequisites
 
 Since the task specifies:
-- Your built image is pushed to DockerHub
+- ```Your built image is pushed to DockerHub```
+
 The created application image is uploaded to DockerHub, the testing script tests it.
 The Postres image was not created, but in accordance with the task recommendations, a special image was taken from DockerHub
 
@@ -31,10 +32,6 @@ git checkout develop-pt2
 
 ## Create .env file if absent (based on .env.example)
 
-```
-./.env
-```
-
 ## Installing NPM modules
 
 ```
@@ -50,24 +47,18 @@ npm run docker:start
 ```
 
 ## Wait until the necessary images are downloaded, containers are assembled and launched, this will be indicated by the appearance of the following message in the terminal:
-app | [Nest] 286 - 11/17/2024, 9:36:09 PM LOG [NestApplication] Nest application successfully started
+### [NestApplication] Nest application successfully started
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing 
+## After starting the app on port (4000 as default) you can open in your browser OpenAPI documentation by typing
+
 ```
-http://localhost:4000/doc/.
+http://localhost:4000/doc/
 ```
 
 ## Open another wsl console and run the command to run the tests
 
 ```
 npm run test
-```
-
-## Scan Docker image for vulnerabilities
-
-```
-npm run scan
 ```
 
 ## Stop containers
@@ -80,6 +71,12 @@ npm run docker:stop
 
 ```
 npm run docker:images
+```
+
+## Scan Docker image for vulnerabilities
+
+```
+npm run docker:scan
 ```
 
 # What else can you do
