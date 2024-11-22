@@ -6,7 +6,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 
 export const IS_PUBLIC_KEY = 'isPublic';
@@ -25,24 +24,19 @@ export class AuthGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    const token = this.getTokenFromRequest(request);
-    if (!token) {
-      throw new UnauthorizedException();
+    const [bearer, token] = request.headers.authorization?.split(' ') ?? [];
+    if (bearer !== 'Bearer' || !token) {
+      throw new UnauthorizedException('User is not authorized');
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const user = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET_KEY,
       });
 
-      request['user'] = payload;
+      request.user = user;
     } catch {
       throw new UnauthorizedException();
     }
     return true;
-  }
-
-  private getTokenFromRequest(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

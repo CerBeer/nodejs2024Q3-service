@@ -19,7 +19,7 @@ export class AuthService {
     this.salt = parseInt(process.env.CRYPT_SALT);
   }
 
-  async signup(createUserDto: CreateUserDto): Promise<any> {
+  async signup(createUserDto: CreateUserDto) {
     const { login, password } = createUserDto;
     try {
       const hashPassword = await bcrypt.hash(password, this.salt);
@@ -33,32 +33,31 @@ export class AuthService {
     }
   }
 
-  async login(createUserDto: CreateUserDto): Promise<any> {
+  async login(createUserDto: CreateUserDto) {
     const { login, password } = createUserDto;
     const user = await this.userService.findByLogin(login);
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { userId: user.id, login: user.login };
-    const tokens = await this.getToken(payload);
+    const tokens = await this.getToken(user.id, login);
     return tokens;
   }
 
-  async refresh(token: string): Promise<any> {
+  async refresh(token: string) {
     if (!token) throw new UnauthorizedException('Refresh token is not valid');
     try {
       const { userId, login } = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET_REFRESH_KEY,
       });
-      const payload = { userId: userId, login: login };
-      return await this.getToken(payload);
+      return await this.getToken(userId, login);
     } catch (error) {
       throw new ForbiddenException('Refresh token is not valid');
     }
   }
 
-  private async getToken(payload: { userId: string; login: string }) {
+  private async getToken(userId: string, login: string) {
+    const payload = { userId, login };
     return {
       accessToken: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET_KEY,
