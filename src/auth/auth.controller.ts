@@ -33,7 +33,6 @@ export class AuthController {
   @Public()
   @HttpCode(200)
   refresh(@Body() { refreshToken }: { refreshToken: string }) {
-    console.log(refreshToken);
     return this.authService.refresh(refreshToken);
   }
 }
