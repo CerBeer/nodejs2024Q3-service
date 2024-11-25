@@ -1,0 +1,24 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: always
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - pglog:/var/log/postgresql
+    networks:
+      - intranet
+
+volumes:
+  pgdata:
+  pglog:
+
+networks:
+  intranet:
+    name: intranet
+    driver: bridge
