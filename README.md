@@ -2,12 +2,6 @@
 
 ## Prerequisites
 
-Since the task specifies:
-- ```Your built image is pushed to DockerHub```
-
-The created application image is uploaded to DockerHub, the testing script tests it.
-The Postres image was not created, but in accordance with the task recommendations, a special image was taken from DockerHub
-
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
 - Docker - [Download & Install Docker](https://www.docker.com/products/docker-desktop/).
@@ -27,7 +21,7 @@ cd nodejs2024Q3-service
 ## Switch branch
 
 ```
-git checkout develop-pt2
+git checkout develop-pt3
 ```
 
 ## Installing NPM modules
@@ -38,7 +32,7 @@ npm install
 
 ## For Windows Open wsl terminal
 
-## Run containers
+## Run database container and start app
 
 ```
 npm run docker:start
@@ -58,13 +52,13 @@ http://localhost:4000/doc/
 ## Open another wsl console and run the command to run a general test
 
 ```
-npm run test
+npm run test:auth
 ```
 
 ## To run tests one by one
 
 ```
-npm run test user && npm run test album && npm run test artist && npm run test track && npm run test favorites
+npm run test:auth user && npm run test:auth album && npm run test:auth artist && npm run test:auth track && npm run test:auth favorites
 ```
 
 ## Stop containers
@@ -73,17 +67,6 @@ npm run test user && npm run test album && npm run test artist && npm run test t
 npm run docker:stop
 ```
 
-## Check docker images size
-
-```
-npm run docker:images
-```
-
-## Scan Docker image for vulnerabilities
-
-```
-npm run docker:scan
-```
 
 # What else can you do
 

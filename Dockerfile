@@ -7,8 +7,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install app dependencies
-# RUN npm install --force --omit=dev && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force
 
 COPY . .
 
-CMD [ "npm", "run", "docker:app:init" ]
+CMD [ "npm", "run", "docker:start:app" ]

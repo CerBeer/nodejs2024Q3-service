@@ -24,6 +24,7 @@
     "prisma:studio": "npx prisma studio",
     "docker:pg:start": "docker-compose -f docker-compose-pg.yaml up -d && dotenv -e .env.local -- npm run docker:pg:start:app",
     "docker:pg:stop": "docker-compose -f docker-compose-pg.yaml down",
+    "docker:start:app": "npx prisma generate && npx prisma migrate deploy && npm run start",
     "docker:app:init": "npm install --omit=dev && npm cache clean --force && npx prisma generate && npx prisma migrate deploy && nest start",
     "docker:start": "docker-compose up --watch",
     "docker:stop": "docker-compose down",
