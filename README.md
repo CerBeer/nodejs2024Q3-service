@@ -32,10 +32,16 @@ npm install
 
 ## For Windows Open wsl terminal
 
-## Run database container and start app
+## Run database and app containers
 
 ```
 npm run docker:start
+```
+
+## Or Run database container and start app local. This will allow you to see the logs in the logs folder in the application folder
+
+```
+npm run docker:pg:start
 ```
 
 ## Wait until the application is fully launched
@@ -61,10 +67,17 @@ npm run test:auth
 npm run test:auth user && npm run test:auth album && npm run test:auth artist && npm run test:auth track && npm run test:auth favorites
 ```
 
-## Stop containers
+## Stop database and app containers
 
 ```
 npm run docker:stop
+```
+
+## OR Stop database container and app
+
+```
+press ctrl+c to stop app and run command
+npm run docker:pg:stop
 ```
 
 
