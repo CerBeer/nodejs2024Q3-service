@@ -48,16 +48,10 @@ export class UserService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     const { oldPassword, newPassword } = updateUserDto;
     if (!oldPassword) {
-      throw new HttpException(
-        'Old password are required',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('Old password are required', HttpStatus.BAD_REQUEST);
     }
     if (!newPassword) {
-      throw new HttpException(
-        'New password are required',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('New password are required', HttpStatus.BAD_REQUEST);
     }
 
     const user = await this.prisma.user.findUnique({ where: { id } });

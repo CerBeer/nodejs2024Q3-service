@@ -12,10 +12,7 @@ import { UserService } from 'src/user/user.service';
 @Injectable()
 export class AuthService {
   private salt: number;
-  constructor(
-    private userService: UserService,
-    private jwtService: JwtService,
-  ) {
+  constructor(private userService: UserService, private jwtService: JwtService) {
     this.salt = parseInt(process.env.CRYPT_SALT);
   }
 

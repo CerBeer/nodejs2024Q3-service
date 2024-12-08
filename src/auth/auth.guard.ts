@@ -7,13 +7,18 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
+import { LoggerService } from 'src/logger/logger.service';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private reflector: Reflector) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private reflector: Reflector,
+    private readonly loggerService: LoggerService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -26,6 +31,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const [bearer, token] = request.headers.authorization?.split(' ') ?? [];
     if (bearer !== 'Bearer' || !token) {
+      this.loggerService.logRequest(request, this.setID(request));
       throw new UnauthorizedException('User is not authorized');
     }
     try {
@@ -35,8 +41,15 @@ export class AuthGuard implements CanActivate {
 
       request.user = user;
     } catch {
+      this.loggerService.logRequest(request, this.setID(request));
       throw new UnauthorizedException();
     }
     return true;
+  }
+
+  private setID(request: Request) {
+    const id = crypto.randomUUID();
+    request['id'] = id;
+    return id;
   }
 }

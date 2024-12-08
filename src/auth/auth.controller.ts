@@ -5,6 +5,7 @@ import {
   UsePipes,
   ValidationPipe,
   HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -17,21 +18,19 @@ export class AuthController {
 
   @Post('signup')
   @Public()
-  @HttpCode(201)
   create(@Body() createUserDto: CreateUserDto) {
     return this.authService.signup(createUserDto);
   }
 
   @Post('login')
   @Public()
-  @HttpCode(200)
   login(@Body() createUserDto: CreateUserDto) {
     return this.authService.login(createUserDto);
   }
 
   @Post('refresh')
   @Public()
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   refresh(@Body() { refreshToken }: { refreshToken: string }) {
     return this.authService.refresh(refreshToken);
   }

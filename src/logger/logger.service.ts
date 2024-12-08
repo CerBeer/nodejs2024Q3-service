@@ -1,52 +1,53 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { appendFile, mkdir, readdir, stat } from 'fs/promises';
+import { Request, Response } from 'express';
+import { addErrorListeners } from './exceptions/process.exception.listener';
 
-const LOG_LEVELS = ['log', 'debug', 'error', 'verbose', 'warn'];
-const LOG_LEVEL = parseInt(process.env.LOG_LEVEL || '4');
+const LOG_LEVELS = ['fatal', 'error', 'warn', 'log', 'debug', 'verbose'];
+const LOG_LEVEL = parseInt(process.env.LOG_LEVEL || '3');
 const LOG_FOLDER = process.env.LOG_FOLDER || 'logs';
-const LOG_FILENAME_LOG = process.env.LOG_FILENAME_LOG || 'err.log';
-const LOG_FILENAME_ERR = process.env.LOG_FILENAME_ERR || 'log.log';
-const LOG_MAX_FILE_SIZE =
-  parseInt(process.env.LOG_MAX_FILE_SIZE || '512') * 1024;
+const LOG_EXTENSION_LOG = process.env.LOG_EXTENSION_LOG || 'err';
+const LOG_EXTENSION_ERR = process.env.LOG_EXTENSION_ERR || 'log';
+const LOG_MAX_FILE_SIZE = parseInt(process.env.LOG_MAX_FILE_SIZE || '512') * 1024;
 
 @Injectable()
 export class LoggerService extends ConsoleLogger {
   private logFolder = LOG_FOLDER;
   private logLevel = LOG_LEVEL;
-  private logFileNameLog = LOG_FILENAME_LOG;
-  private logFileNameErr = LOG_FILENAME_ERR;
+  private logFileExtension = LOG_EXTENSION_LOG;
+  private errFileExtension = LOG_EXTENSION_ERR;
   private logMaxFileSize = LOG_MAX_FILE_SIZE;
 
-  private logFileLog = `${Math.round(Date.now() / 1000)}.${
-    this.logFileNameLog
-  }`;
+  private logFileName = `${Math.round(Date.now() / 1000)}.${this.logFileExtension}`;
 
-  private logFileErr = `${Math.round(Date.now() / 1000)}.${
-    this.logFileNameErr
-  }`;
+  private errFileName = `${Math.round(Date.now() / 1000)}.${this.errFileExtension}`;
 
   constructor() {
     super();
+    addErrorListeners(this);
+    this.checkLogFolder();
   }
 
   private async checkLogFolder() {
     try {
       await readdir(this.logFolder);
     } catch (err) {
-      await mkdir(this.logFolder, { recursive: true });
+      try {
+        await mkdir(this.logFolder, { recursive: true });
+      } catch (err) {
+        console.error('Error creating logs directory:', err.message);
+      }
     }
   }
 
   private async checkSizeLog() {
-    const target = `${this.logFolder}/${this.logFileLog}`;
+    const target = `${this.logFolder}/${this.logFileName}`;
 
     try {
       if (await this.fileExists(target)) {
         const { size } = await stat(target);
         if (size > this.logMaxFileSize) {
-          this.logFileLog = `${Math.round(Date.now() / 1000)}.${
-            this.logFileNameLog
-          }`;
+          this.logFileName = `${Math.round(Date.now() / 1000)}.${this.logFileExtension}`;
         }
       }
     } catch (error) {
@@ -55,15 +56,13 @@ export class LoggerService extends ConsoleLogger {
   }
 
   private async checkSizeErr() {
-    const target = `${this.logFolder}/${this.logFileErr}`;
+    const target = `${this.logFolder}/${this.errFileName}`;
 
     try {
       if (await this.fileExists(target)) {
         const { size } = await stat(target);
         if (size > this.logMaxFileSize) {
-          this.logFileErr = `${Math.round(Date.now() / 1000)}.${
-            this.logFileNameErr
-          }`;
+          this.errFileName = `${Math.round(Date.now() / 1000)}.${this.errFileExtension}`;
         }
       }
     } catch (error) {
@@ -72,23 +71,31 @@ export class LoggerService extends ConsoleLogger {
   }
 
   private async writeLog(level: number, message: string) {
-    await this.checkLogFolder();
+    // await this.checkLogFolder();
     await this.checkSizeLog();
 
-    const target = `${this.logFolder}/${this.logFileLog}`;
-    const toWrite = `[${
-      LOG_LEVELS[level]
-    }] ${new Date().toISOString()} ${message}\n`;
-    await appendFile(target, toWrite);
+    const target = `${this.logFolder}/${this.logFileName}`;
+    const timestamp = new Date().toISOString();
+    const toWrite = `[${timestamp}] ${LOG_LEVELS[level]}: ${message}\n`;
+    try {
+      await appendFile(target, toWrite);
+    } catch (err) {
+      console.error('Error writing to log file:', err.message);
+    }
   }
 
-  private async writeErr(message: string) {
-    await this.checkLogFolder();
+  private async writeErr(level: number, message: string) {
+    // await this.checkLogFolder();
     await this.checkSizeErr();
 
-    const target = `[error] ${this.logFolder}/${this.logFileErr}`;
-    const toWrite = message + '\n';
-    await appendFile(target, toWrite);
+    const target = `${this.logFolder}/${this.errFileName}`;
+    const timestamp = new Date().toISOString();
+    const toWrite = `[${timestamp}] ${LOG_LEVELS[level]}: ${message}\n`;
+    try {
+      await appendFile(target, toWrite);
+    } catch (err) {
+      console.error('Error writing to error log file:', err.message);
+    }
   }
 
   private async fileExists(filePath: string): Promise<boolean> {
@@ -103,36 +110,59 @@ export class LoggerService extends ConsoleLogger {
     }
   }
 
-  async log(message: string) {
+  async fatal(message: any) {
+    super.error(message);
+    await this.writeErr(0, message);
     await this.writeLog(0, message);
-    super.log(message);
-  }
-
-  async debug(message: any) {
-    if (this.logLevel > 0) {
-      await this.writeLog(1, message);
-      super.debug(message);
-    }
   }
 
   async error(message: any) {
-    if (this.logLevel > 1) {
-      await this.writeErr(message);
+    if (this.logLevel > 0) {
       super.error(message);
-    }
-  }
-
-  async verbose(message: any) {
-    if (this.logLevel === 2) {
-      await this.writeLog(3, message);
-      super.verbose(message);
+      await this.writeErr(1, message);
+      await this.writeLog(1, message);
     }
   }
 
   async warn(message: any) {
-    if (this.logLevel > 3) {
-      await this.writeLog(4, message);
+    if (this.logLevel > 1) {
       super.warn(message);
+      await this.writeLog(2, message);
     }
+  }
+
+  async log(message: any) {
+    if (this.logLevel > 2) {
+      super.log(message);
+      await this.writeLog(3, message);
+    }
+  }
+
+  async debug(message: any) {
+    if (this.logLevel > 3) {
+      super.debug(message);
+      await this.writeLog(4, message);
+    }
+  }
+
+  async verbose(message: any) {
+    if (this.logLevel > 4) {
+      super.verbose(message);
+      await this.writeLog(5, message);
+    }
+  }
+
+  async logRequest(req: Request, id?: string): Promise<void> {
+    const { method, url, body, query } = req;
+    await this.log(
+      `Request-${id || req['id']}: ${method} ${url}, Query: ${JSON.stringify(
+        query,
+      )}, Body: ${JSON.stringify(body)}`,
+    );
+  }
+
+  async logResponse(res: Response, id?: string, duration?: number): Promise<void> {
+    const formatDuration = duration ? ` [${duration}ms]` : '';
+    await this.log(`Response-${id || res['id']}: statusCode: ${res.statusCode}${formatDuration}`);
   }
 }

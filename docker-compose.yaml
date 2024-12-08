@@ -32,7 +32,7 @@ services:
       - .env
     restart: always
     ports:
-      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+      - '${POSTGRES_PORT_EXTERNAL}:${POSTGRES_PORT}'
     volumes:
       - pgdata:/var/lib/postgresql/data
       - pglog:/var/log/postgresql

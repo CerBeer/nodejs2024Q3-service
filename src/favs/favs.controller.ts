@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Delete,
-  ParseUUIDPipe,
-  HttpCode,
-} from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, ParseUUIDPipe, HttpCode } from '@nestjs/common';
 import { FavsService } from './favs.service';
 import { IsUUID } from 'class-validator';
 import { StatusCodes } from 'http-status-codes';
